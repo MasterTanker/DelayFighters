@@ -1,0 +1,250 @@
+[gd_scene load_steps=15 format=2]
+
+[ext_resource path="res://Boton.gd" type="Script" id=1]
+[ext_resource path="res://art/ButtonDownAnim.png" type="Texture" id=2]
+[ext_resource path="res://art/GateStone.png" type="Texture" id=3]
+[ext_resource path="res://art/Gate-Right.png" type="Texture" id=4]
+[ext_resource path="res://art/Gate-Left.png" type="Texture" id=5]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 16, 1.5 )
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 15, 5 )
+
+[sub_resource type="RectangleShape2D" id=6]
+extents = Vector2( 16, 16 )
+
+[sub_resource type="Animation" id=7]
+resource_name = "DoorC"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/path = NodePath("Door:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ 0 ]
+}
+
+[sub_resource type="Animation" id=8]
+resource_name = "DoorO"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/path = NodePath("Door:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 0, 1, 2, 3, 4, 5, 6, 7 ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Door/StaticBody2D/CollisionShape2D:disabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.5 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ false, true ]
+}
+
+[sub_resource type="Animation" id=3]
+resource_name = "Pressed"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/path = NodePath("Boton:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 0, 1, 2, 3 ]
+}
+
+[sub_resource type="Animation" id=4]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath("Boton:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 0 ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Door:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 0 ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Door/StaticBody2D/CollisionShape2D:disabled")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ false ]
+}
+
+[sub_resource type="Animation" id=5]
+resource_name = "Unpressed"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/path = NodePath("Boton:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ 0 ]
+}
+
+[sub_resource type="Animation" id=9]
+resource_name = "DoorO"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/path = NodePath("Door:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 0, 1, 2, 3, 4, 5, 6, 7 ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Door/StaticBody2D/CollisionShape2D:disabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.5 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ false, true ]
+}
+
+[node name="Boton" type="Node2D"]
+script = ExtResource( 1 )
+
+[node name="Boton" type="Sprite" parent="."]
+position = Vector2( 0, -16 )
+texture = ExtResource( 2 )
+hframes = 4
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Boton"]
+position = Vector2( 0, 15 )
+collision_layer = 256
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boton/StaticBody2D"]
+position = Vector2( 0, -0.5 )
+shape = SubResource( 1 )
+
+[node name="Area2D" type="Area2D" parent="Boton"]
+position = Vector2( 0, 15 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boton/Area2D"]
+position = Vector2( 0, -7 )
+shape = SubResource( 2 )
+
+[node name="Boton2" type="Sprite" parent="."]
+position = Vector2( 142, -16 )
+texture = ExtResource( 2 )
+hframes = 4
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Boton2"]
+position = Vector2( 0, 15 )
+collision_layer = 256
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boton2/StaticBody2D"]
+position = Vector2( 0, -0.5 )
+shape = SubResource( 1 )
+
+[node name="Area2D" type="Area2D" parent="Boton2"]
+position = Vector2( 0, 15 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boton2/Area2D"]
+position = Vector2( 0, -7 )
+shape = SubResource( 2 )
+
+[node name="Door" type="Sprite" parent="."]
+position = Vector2( 77, -27 )
+scale = Vector2( 1.625, 1.6875 )
+z_index = 3
+texture = ExtResource( 3 )
+hframes = 8
+
+[node name="gateleft" type="Sprite" parent="Door"]
+position = Vector2( 1.90735e-06, 0 )
+scale = Vector2( 1, 1 )
+z_index = 2
+texture = ExtResource( 5 )
+
+[node name="gateright" type="Sprite" parent="Door"]
+position = Vector2( 3.07692, -9.53674e-07 )
+scale = Vector2( 0.793269, 1 )
+z_index = 2
+texture = ExtResource( 4 )
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Door"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Door/StaticBody2D"]
+visible = false
+shape = SubResource( 6 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/DoorC = SubResource( 7 )
+anims/DoorO = SubResource( 8 )
+anims/Pressed = SubResource( 3 )
+anims/RESET = SubResource( 4 )
+anims/Unpressed = SubResource( 5 )
+
+[node name="AnimationPlayer2" type="AnimationPlayer" parent="."]
+anims/DoorO = SubResource( 9 )
+
+[connection signal="body_entered" from="Boton/Area2D" to="." method="_on_Area2D_body_entered"]
+[connection signal="body_exited" from="Boton/Area2D" to="." method="_on_Area2D_body_exited"]
+[connection signal="body_entered" from="Boton2/Area2D" to="." method="_on_Area2D_body_entered"]
+[connection signal="body_exited" from="Boton2/Area2D" to="." method="_on_Area2D_body_exited"]

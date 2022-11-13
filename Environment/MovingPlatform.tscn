@@ -1,25 +1,19 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://art/Taiga-Asset-Pack_v2_vnitti/PNG/Tileset.png" type="Texture" id=1]
 [ext_resource path="res://Environment/MovingPlatform.gd" type="Script" id=2]
+[ext_resource path="res://Environment/occluderMP.tres" type="OccluderPolygon2D" id=3]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 24, 8 )
 
-[node name="MovingPlatform" type="Node2D" groups=[
-"moving_platforms",
-"timed",
-]]
+[node name="MovingPlatform" type="Node2D" groups=["moving_platforms", "timed"]]
 script = ExtResource( 2 )
 
-[node name="EndPos" type="Position2D" parent="." groups=[
-"movable_in_editor",
-]]
+[node name="EndPos" type="Position2D" parent="." groups=["movable_in_editor"]]
 position = Vector2( 128, 0 )
 
-[node name="Platform" type="KinematicBody2D" parent="." groups=[
-"movable_in_editor",
-]]
+[node name="Platform" type="KinematicBody2D" parent="." groups=["movable_in_editor"]]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Platform"]
 shape = SubResource( 1 )
@@ -31,6 +25,9 @@ rotation = 1.57079
 texture = ExtResource( 1 )
 region_enabled = true
 region_rect = Rect2( 16, 48, 16, 16 )
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Platform/Graphics/Sprite"]
+occluder = ExtResource( 3 )
 
 [node name="Sprite2" type="Sprite" parent="Platform/Graphics"]
 position = Vector2( 16, 0 )

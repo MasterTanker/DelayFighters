@@ -7,8 +7,11 @@ onready var editor_ui = $EditorUI
 onready var game_manager = $World
 onready var command_input = $EditorUI/CommandInput
 onready var ground_tile_button = $EditorUI/TilePalette/GridContainer/GroundTile
+onready var brick_tile_button = $EditorUI/TilePalette/GridContainer/BrickTile
 onready var spikes_tile_button = $EditorUI/TilePalette/GridContainer/SpikesTile
 onready var moving_platform_tile_button = $EditorUI/TilePalette/GridContainer/MovingPlatformTile
+onready var lava_tile_button = $EditorUI/TilePalette/GridContainer/LavaAnimada
+onready var torch_tile_button = $EditorUI/TilePalette/GridContainer/Torch
 
 onready var tilemap = $TileMap
 onready var saved_levels_container = $EditorUI/LoadLevels/Panel/ScrollContainer/VBoxContainer
@@ -32,7 +35,10 @@ func _ready():
 	set_edit_mode()
 	command_input.connect("text_entered", self, "enter_input_command")
 	ground_tile_button.connect("button_up", self, "select_ground_tile")
+	brick_tile_button.connect("button_up", self, "select_brick_tile")
 	spikes_tile_button.connect("button_up", self, "select_spikes_tile")
+	lava_tile_button.connect("button_up", self, "select_lava_tile")
+	torch_tile_button.connect("button_up", self, "select_torch_tile")
 	moving_platform_tile_button.connect("button_up", self, "select_moving_platform_tile")
 	
 	top_left_pos = tilemap.world_to_map($TileMap/TopLeft.global_position)
@@ -75,14 +81,19 @@ func enter_input_command(command_text: String):
 	game_manager.parse_chat_input(SettingsManager.channel_name, command_text, true)
 	command_input.text = ""
 
-enum TILES {NONE, GROUND, SPIKES, MOVING_PLATFORM}
+enum TILES {NONE, GROUND, SPIKES, MOVING_PLATFORM, LAVA, TORCH, BRICK}
 var cur_tile = TILES.NONE
 onready var selected_sprite_display = $SelectedSpriteDisplay
 const GROUND_TILE_ID = 1
+const BRICK_TILE_ID = 6
 var moving_platform_obj = preload("res://Environment/MovingPlatform.tscn")
-var spike_obj = preload("res://Environment/Spikes.tscn")
+var spike_object = preload("res://Environment/Spikes.tscn")
+var lava_object = preload("res://Environment/Lava.tscn")
+var torch_object = preload("res://Environment/Torch.tscn")
 var all_spikes_placed = {}
 var all_moving_platforms_placed = {}
+var all_torch_placed = {}
+var all_lava_placed = {}
 
 var last_x = 9999
 var last_y = 9999
@@ -91,7 +102,9 @@ func set_tile_none():
 	cur_tile = TILES.NONE
 	selected_sprite_display.texture = null
 	ground_tile_button.pressed = false
+	brick_tile_button.pressed = false
 	spikes_tile_button.pressed = false
+	lava_tile_button.pressed = false
 	moving_platform_tile_button.pressed = false
 	
 func select_spikes_tile():
@@ -107,6 +120,13 @@ func select_ground_tile():
 		return
 	cur_tile = TILES.GROUND
 	selected_sprite_display.texture = ground_tile_button.icon
+	
+func select_brick_tile():
+	if cur_tile == TILES.BRICK:
+		set_tile_none()
+		return
+	cur_tile = TILES.BRICK
+	selected_sprite_display.texture = brick_tile_button.icon
 
 func select_moving_platform_tile():
 	if cur_tile == TILES.MOVING_PLATFORM:
@@ -114,6 +134,20 @@ func select_moving_platform_tile():
 		return
 	cur_tile = TILES.MOVING_PLATFORM
 	selected_sprite_display.texture = moving_platform_tile_button.icon
+	
+func select_torch_tile():
+	if cur_tile == TILES.TORCH:
+		set_tile_none()
+		return
+	cur_tile = TILES.TORCH
+	selected_sprite_display.texture = torch_tile_button.icon
+
+func select_lava_tile():
+	if cur_tile == TILES.LAVA:
+		set_tile_none()
+		return
+	cur_tile = TILES.LAVA
+	selected_sprite_display.texture = lava_tile_button.icon
 
 var grabbed_obj : Node2D
 func _process(delta):
@@ -159,13 +193,19 @@ func place_tile(x: int, y: int):
 		place_spike(x, y)
 	elif cur_tile == TILES.GROUND:
 		place_ground_tile(x, y)
+	elif cur_tile == TILES.BRICK:
+		place_brick_tile(x, y)
 	elif cur_tile == TILES.MOVING_PLATFORM:
 		place_moving_platform(x, y)
+	if cur_tile == TILES.LAVA:
+		place_lava(x, y)
+	if cur_tile == TILES.TORCH:
+		place_torch(x, y)
 	last_x = x
 	last_y = y
 
 func place_spike(x: int, y: int):
-	var spike_inst = spike_obj.instance()
+	var spike_inst = spike_object.instance()
 	all_spikes_placed[get_id_from_coords(x, y)] = spike_inst
 	get_tree().get_root().add_child(spike_inst)
 	spike_inst.global_position = tilemap.map_to_world(Vector2(x, y)) + Vector2(8,8)
@@ -182,6 +222,25 @@ func place_spike(x: int, y: int):
 			spike_inst.global_rotation = deg2rad(-90)
 		elif top_tile_taken:
 			spike_inst.global_rotation = deg2rad(180)
+			
+func place_lava(x: int, y: int):
+	var lava_inst = lava_object.instance()
+	all_lava_placed[get_id_from_coords(x, y)] = lava_inst
+	get_tree().get_root().add_child(lava_inst)
+	lava_inst.global_position = tilemap.map_to_world(Vector2(x, y)) + Vector2(8,8)
+	
+	var left_tile_taken = tilemap.get_cell(x - 1, y) >= 0
+	var right_tile_taken = tilemap.get_cell(x + 1, y) >= 0
+	var top_tile_taken = tilemap.get_cell(x, y - 1) >= 0
+	var bot_tile_taken = tilemap.get_cell(x, y + 1) >= 0
+	
+	if !bot_tile_taken: # default rotation
+		if left_tile_taken:
+			lava_inst.global_rotation = deg2rad(90)
+		elif right_tile_taken:
+			lava_inst.global_rotation = deg2rad(-90)
+		elif top_tile_taken:
+			lava_inst.global_rotation = deg2rad(180)
 
 func place_moving_platform(x: int, y: int):
 	var moving_platform_inst = moving_platform_obj.instance()
@@ -197,6 +256,21 @@ func place_ground_tile(x: int, y: int):
 	if y == to_int(top_left_pos.y):
 		for i in range(8):
 			place_ground_tile(x, y - 1 - i)
+			
+func place_brick_tile(x: int, y: int):
+	tilemap.set_cell(x, y, BRICK_TILE_ID)
+	tilemap.update_bitmask_area(Vector2(x, y))
+	if y == to_int(top_left_pos.y):
+		for i in range(8):
+			place_brick_tile(x, y - 1 - i)
+			
+func place_torch(x: int, y: int):
+	var torch_inst = torch_object.instance()
+	all_torch_placed[get_id_from_coords(x, y)] = torch_inst
+	torch_inst.global_position = tilemap.map_to_world(Vector2(x, y)) + Vector2(8,8)
+	get_tree().get_root().add_child(torch_inst)
+	#torch_inst.pause()
+	return torch_inst
 
 func delete_tile(x: int, y: int):
 	tilemap.set_cell(x, y, -1)
@@ -205,6 +279,14 @@ func delete_tile(x: int, y: int):
 	if spike_id in all_spikes_placed:
 		all_spikes_placed[spike_id].queue_free()
 		all_spikes_placed.erase(spike_id)
+	var lava_id = get_id_from_coords(x, y)
+	if lava_id in all_lava_placed:
+		all_lava_placed[lava_id].queue_free()
+		all_lava_placed.erase(lava_id)
+	var torch_id = get_id_from_coords(x, y)
+	if torch_id in all_torch_placed:
+		all_torch_placed[torch_id].queue_free()
+		all_torch_placed.erase(torch_id)
 
 func get_id_from_coords(x: int, y: int):
 	return str(x) + "," + str(y)
@@ -219,7 +301,12 @@ func clear_map():
 			delete_tile(x, y)
 	for spike_id in all_spikes_placed:
 		all_spikes_placed[spike_id].queue_free()
+	for lava_id in all_lava_placed:
+		all_lava_placed[lava_id].queue_free()
+	for torch_id in all_torch_placed:
+		all_torch_placed[torch_id].queue_free()
 	get_tree().call_group("moving_platforms", "queue_free")
+	
 
 func update_saved_levels_list():
 	for child in saved_levels_container.get_children():
@@ -266,6 +353,7 @@ func save_level(save_file_name: String):
 
 func get_level_data():
 	var ground_tiles_data = []
+	var brick_tiles_data = []
 	var start_x = int(round(top_left_pos.x))
 	var end_x = int(round(bot_right_pos.x))
 	var start_y = int(round(top_left_pos.y))
@@ -274,7 +362,9 @@ func get_level_data():
 		for x in range(start_x, end_x+1):
 				if tilemap.get_cell(x, y) >= 0:
 					ground_tiles_data.append({"x" : x, "y" : y})
-	
+				elif tilemap.get_cell(x, y) >= 0:
+					brick_tiles_data.append({"x" : x, "y" : y})
+						
 	var spikes_data = []
 	for spike in all_spikes_placed:
 		var data = {}
@@ -283,17 +373,39 @@ func get_level_data():
 		data.x = to_int(map_pos.x)
 		data.y = to_int(map_pos.y)
 		spikes_data.append(data)
+		
+	var lava_data = []
+	for lava in all_lava_placed:
+		var datalava = {}
+		var lava_obj = all_lava_placed[lava]
+		var map_pos = tilemap.world_to_map(lava_obj.global_position)
+		datalava.x = to_int(map_pos.x)
+		datalava.y = to_int(map_pos.y)
+		lava_data.append(datalava)
 	
 	var moving_platforms_data = []
 	for moving_platform in all_moving_platforms_placed:
 		var mp = all_moving_platforms_placed[moving_platform]
 		if is_instance_valid(mp):
 			moving_platforms_data.append(mp._save())
+			
+	var torch_data = []
+	for torch in all_torch_placed:
+		var datatorch = {}
+		var torch_obj = all_torch_placed[torch]
+		var map_pos = tilemap.world_to_map(torch_obj.global_position)
+		datatorch.x = to_int(map_pos.x)
+		datatorch.y = to_int(map_pos.y)
+		torch_data.append(datatorch)
+		
 	
 	var level_data = {
 		"ground_tiles_data" : ground_tiles_data,
+		"brick_tiles_data" : brick_tiles_data,
 		"spikes_data" : spikes_data,
+		"lava_data" : lava_data,
 		"moving_platforms_data" : moving_platforms_data,
+		"torch_data" : torch_data,
 		"start_point" : {"x": start_point.global_position.x, "y": start_point.global_position.y},
 		"end_point" : {"x": end_point.global_position.x, "y": end_point.global_position.y},
 	}
@@ -321,9 +433,15 @@ func set_level_data(level_data):
 	if "ground_tiles_data" in level_data:
 		for ground_tile_data in level_data.ground_tiles_data:
 			place_ground_tile(ground_tile_data.x, ground_tile_data.y)
+	if "brick_tiles_data" in level_data:
+		for brick_tile_data in level_data.brick_tiles_data:
+			place_brick_tile(brick_tile_data.x, brick_tile_data.y)
 	if "spikes_data" in level_data:
 		for spike_data in level_data.spikes_data:
 			place_spike(spike_data.x, spike_data.y)
+	if "lava_data" in level_data:
+		for lava_data in level_data.lava_data:
+			place_lava(lava_data.x, lava_data.y)
 	if "start_point" in level_data:
 		start_point.global_position = Vector2(level_data.start_point.x, level_data.start_point.y)
 	if "end_point" in level_data:
@@ -331,6 +449,9 @@ func set_level_data(level_data):
 	if "moving_platforms_data" in level_data:
 		for moving_platform_data in level_data.moving_platforms_data:
 			place_moving_platform(0, 0)._load(moving_platform_data)
+	if "torch_data" in level_data:
+		for torch_data in level_data.torch_data:
+			place_torch(torch_data.x, torch_data.y)
 
 func save_file_name_to_path(save_file_name: String):
 	return SAVE_FILES_DIRECTORY + save_file_name + ".level"

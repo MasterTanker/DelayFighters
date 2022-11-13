@@ -465,4 +465,5 @@ position = Vector2( 440, 72 )
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2( 513.299, 299.806 )
 current = true
+
 [connection signal="timeout" from="World/CanvasLayer/DeathDisplay/Timer" to="World/CanvasLayer/DeathDisplay" method="hide"]

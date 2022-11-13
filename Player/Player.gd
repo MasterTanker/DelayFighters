@@ -5,6 +5,7 @@ var player_name = ""
 var velocity : Vector2
 var gravity = 250
 
+
 const BASE_JUMP_FORCE = 40
 const MAX_JUMP_POWER = 10
 const SLOW_DOWN_ON_WALL = 400
@@ -27,11 +28,32 @@ var last_time_jumped = 0.0
 var was_grounded = true
 var snap = Vector2.DOWN * 2
 
+var velo = Vector2()
+
+var being_knocked_back = false
+var knockback_time = 0.3
+var cur_knockback_time = 0.0
+var knockback_vec = Vector2()
+
+func _ready():
+	#Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
+	get_tree().call_group("need_player_ref", "set_player", self)
+
 func set_player_name(new_name: String):
 	player_name = new_name
 	$Label.text = new_name
 
 func _physics_process(delta):
+	if being_knocked_back:
+		move_and_slide(knockback_vec, Vector2.UP)
+		cur_knockback_time += delta
+		if cur_knockback_time > knockback_time:
+			being_knocked_back = 0.0
+			velo = knockback_vec
+	else:
+		calc_regular_movement(delta)
+
+func calc_regular_movement(delta):
 	velocity += Vector2.DOWN * gravity * delta
 	velocity.y = move_and_slide_with_snap(velocity, snap, Vector2.UP).y
 	for i in range(get_slide_count()):
@@ -88,10 +110,13 @@ func died():
 	if dead:
 		return
 	dead = true
+	
 	var blood_spray_inst = blood_spray_obj.instance()
 	get_tree().get_root().add_child(blood_spray_inst)
 	blood_spray_inst.global_position = global_position
 	emit_signal("died", player_name)
+	
+	
 
 func get_player_name():
 	return player_name
@@ -107,15 +132,18 @@ func set_won():
 #	"Miz_Goku.png": Vector2(0.0, 12.0),
 #}
 var skins = [
-	"res://Player/skins/boxes.png",
-	"res://Player/skins/cat-sprite.png",
-	"res://Player/skins/goblin.png",
-	"res://Player/skins/large_candleguy.png",
-	"res://Player/skins/large_gal.png",
-	"res://Player/skins/Miz_Goku.png",
-	"res://Player/skins/mushroom.png",
-	"res://Player/skins/ring_character.png",
-	"res://Player/skins/skeleton.png"
+	#"res://Player/skins/boxes.png",
+	#"res://Player/skins/cat-sprite.png",
+	#"res://Player/skins/goblin.png",
+	#"res://Player/skins/large_candleguy.png",
+	#"res://Player/skins/large_gal.png",
+	#"res://Player/skins/Miz_Goku.png",
+	#"res://Player/skins/mushroom.png",
+	#"res://Player/skins/ring_character.png",
+	"res://Player/skins/barny.png",
+	"res://Player/skins/Tomate.png",
+	#"res://Player/skins/Floppa.png",
+	#"res://Player/skins/genos.png"
 ]
 func set_skin(skin_index: int):
 #	var files = []
@@ -161,3 +189,8 @@ func run_next_command():
 
 func get_cur_time():
 	return OS.get_ticks_msec()/1000.0
+	
+func knockback(dir, power):
+	cur_knockback_time = 0.0
+	being_knocked_back = true
+	knockback_vec = dir * power

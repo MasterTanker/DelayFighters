@@ -113,9 +113,7 @@ margin_right = 56.0
 margin_bottom = 65.0
 custom_fonts/font = SubResource( 4 )
 
-[node name="ClockDisplay" type="Label" parent="." groups=[
-"timed",
-]]
+[node name="ClockDisplay" type="Label" parent="." groups=["timed"]]
 margin_left = 16.0
 margin_top = 8.0
 margin_right = 56.0
@@ -126,4 +124,5 @@ script = ExtResource( 6 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
 [connection signal="timeout" from="DeathDisplay/Timer" to="DeathDisplay" method="hide"]
