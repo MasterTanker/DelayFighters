@@ -6,3 +6,10 @@ example:
 	"channel_name": miziziziz,
 	"oauth_token": asdasdjkhk
 }
+
+
+My Take on Platswarmers
+
+Added some tiles to the editor and changed almost all the art.
+
+The editor has more bugs now.
