@@ -106,6 +106,7 @@ func set_tile_none():
 	spikes_tile_button.pressed = false
 	lava_tile_button.pressed = false
 	moving_platform_tile_button.pressed = false
+	torch_tile_button.pressed = false
 	
 func select_spikes_tile():
 	if cur_tile == TILES.SPIKES:
